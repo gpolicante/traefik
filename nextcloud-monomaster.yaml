@@ -1,0 +1,67 @@
+version: '3.3'
+
+services: 
+
+
+ nextcloud: 
+  image: nextcloud-homolog
+  command: /usr/sbin/apache2 -DFOREGROUND
+  depends_on:
+   - redis
+  deploy:
+   labels: 
+     - "traefik.port=80"
+     - "traefik.backend.healthcheck.port=80"
+     - "traefik.frontend.rule=Host:nextcloud.teste.com"
+     - "traefik.backend.healthcheck.interval=2s"
+     - "traefik.backend.loadbalancer.method=drr"
+     - "traefik.backend.maxconn.amount=400"
+     - "traefik.backend.maxconn.extractorfunc=client.ip" 
+     - "traefik.backend.loadbalancer.sticky=true"
+   replicas: 2
+  volumes:
+   - /srv/data/:/data
+ 
+
+ redis:
+  image: redis 
+  deploy:
+   replicas: 1 
+   placement:
+    constraints: 
+     - node.hostname == manager
+
+
+ proxy:
+  image: traefik
+  command: --web /  
+   --docker /
+   --docker.swarmmode /
+   --docker.domain=nextcloud.teste.com /
+   --defaultentrypoints="http,https" /
+   --logLevel=INFO / 
+#   --entryPoints="Name:http Address::80 Redirect.Entrypoint:https" /
+#   --entryPoints="Name:https Address::443" /
+#   --accessLog.field.defaultMode="keep" 
+  ports: 
+   - target: 443
+     published: 443
+     protocol: tcp 
+     mode: host
+   - target: 80
+     published: 80 
+     protocol: tcp 
+     mode: host
+   - "8080:8080"
+   - "9090:9090"
+  volumes: 
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /dev/null:/traefik.toml
+#    - /root/ssl/:/ssl
+  deploy:
+   replicas: 1 
+   placement:
+    constraints:
+     - node.hostname == manager
+
+   
