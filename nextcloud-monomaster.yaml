@@ -40,9 +40,9 @@ services:
    --docker.domain=nextcloud.teste.com /
    --defaultentrypoints="http,https" /
    --logLevel=INFO / 
-#   --entryPoints="Name:http Address::80 Redirect.Entrypoint:https" /
-#   --entryPoints="Name:https Address::443" /
-#   --accessLog.field.defaultMode="keep" 
+   --entryPoints="Name:http Address::80 Redirect.Entrypoint:https" /
+   --entryPoints="Name:https Address::443 TLS:/DIRCERT/caio.crt,/DIRCERT/caio.key" /
+   --accessLog.field.defaultMode="keep" 
   ports: 
    - target: 443
      published: 443

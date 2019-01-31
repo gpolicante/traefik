@@ -55,7 +55,7 @@ services:
       - "storeconfig"
       - "--api"
       - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS"
+      - "--entryPoints='Name:https Address::443 TLS:/DIRCERT/caio.crt,/DIRCERT/caio.key'"
       - "--defaultentrypoints=http,https"
       - "--acme"
       - "--acme.storage=traefik/acme/account"
